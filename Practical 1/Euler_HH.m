@@ -1,0 +1,117 @@
+%==============================
+%Euler method vs ODE
+%==============================
+%% Euler Method
+clc; clear;
+%Constants definition
+C=1; % Membrane Capcitance uF
+dt=0.05; % Time Step ms
+t=0:dt:500; %Time Array ms
+I=80; %External Current Applied
+eNa=115; % mV Nernst potential
+eK=-12; % mv K Nernst potential
+eL=10.6; % mv Leakage Nernst potential
+gNac=120; %  Na conductance
+gKc=36; % K conductance
+gLc=0.3; % conductance
+
+Vm = -60; %mV  Resting Membrane voltage
+
+V(1)=Vm; % Initial Membrane voltage
+m(1)=0.5;% Initial m-value
+n(1)=0.5; % Initial n-value
+h(1)=0.5; % Initial h-value
+
+
+for i=1:length(t)-1
+
+ %Euler method to find the next m/n/h value
+ m(i+1) = m(i) + dt*(-(alpha_m(V(i), Vm) + beta_m(V(i), Vm))*m(i) + alpha_m(V(i), Vm));
+ n(i+1)= n(i) + dt*(-(alpha_n(V(i), Vm) + beta_n(V(i), Vm))*n(i) + alpha_n(V(i), Vm));
+ h(i+1)= h(i) + dt*(-(alpha_h(V(i), Vm) + beta_h(V(i), Vm))*h(i) + alpha_h(V(i), Vm));
+ gNa=gNac*m(i)^3*h(i);
+ gK=gKc*n(i)^4;
+ gL=gLc;
+
+ INa=gNa*((V(i)-Vm)-eNa);
+ IK=gK*((V(i)-Vm)-eK);
+ IL=gL*((V(i)-Vm)-eL);
+
+ %Euler method to find the next voltage value
+ V(i+1)= V(i) - dt*(INa + IK + IL) + dt/C*I;
+
+end
+%Store variables for graphing later
+Euler_V=V;
+Euler_m=m;
+Euler_n=n;
+Euler_h=h;
+
+
+
+%% ODE15s Method
+global input_args
+% model_name: 
+mod = @modHH;
+t_sim = 500; % lenght of the simulation in ms
+% ODE settings
+ODEstep = 0.05; % integration step in ms 
+options=odeset('MaxStep',ODEstep);
+CI = [-60, 0.5, 0.5, 0.5];
+input_args = {};
+input_args{2} = [2,80];
+% ode15s function
+[time,X] = ode15s(mod,[0 t_sim],CI,options);
+ODE_V=X(:,1);
+ODE_m=X(:,2);
+ODE_h=X(:,3);
+ODE_n=X(:,4);
+%% Plots
+clf
+%Voltage plot
+figure(1)
+plot(t,Euler_V,time,ODE_V);
+legend('Euler','ODE15s');
+xlabel('Time (ms)');
+ylabel('Voltage (mV)');
+title('Hodgkin-Huxley');
+figure(2)
+%gating variables
+plot(t,Euler_n,'--',t,Euler_m,'--',t,Euler_h,'--');
+hold on
+p2=plot(time,ODE_n,time,ODE_m,time,ODE_h);
+
+p2(1).Color= [0 0.4470 0.7410];
+p2(2).Color = [0.8500 0.3250 0.0980];
+p2(3).Color = [0.9290 0.6940 0.1250];
+ylabel('Gating Variables')
+xlabel('Time (ms)')
+axis([0 5 0 1])
+legend('n Euler',...
+'n_ODE15s','m Euler',...
+'m_ODE15s','h Euler',...
+'h_ODE15s');
+
+
+
+
+%%
+
+function a=alpha_m(V,Vm) %Alpha for Variable m
+    a=(2.5-0.1*(V-Vm)) ./ (exp(2.5-0.1*(V-Vm)) -1);
+end
+function b=beta_m(V,Vm) %Beta for variable m
+    b=4*exp(-(V-Vm)/18);
+end
+function a=alpha_n(V,Vm)%Alpha for variable n
+    a=(0.1-0.01*(V-Vm)) ./ (exp(1-0.1*(V-Vm)) -1);
+end
+function b=beta_n(V,Vm) %Beta for variable n
+    b=0.125*exp(-(V-Vm)/80);
+end
+function a=alpha_h(V,Vm) %Alpha value for variable h
+    a=0.07*exp(-(V-Vm)/20);
+end
+function b =beta_h(V,Vm) %beta value for variable h
+    b=1./(exp(3.0-0.1*(V-Vm))+1);
+end
