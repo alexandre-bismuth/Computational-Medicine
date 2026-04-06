@@ -49,9 +49,9 @@ IC50_IKr  = 1.39;  h_IKr  = 1;
 coef = @(X, IC50, h) 1 / (1 + (X/IC50)^h);
 
 % Clinically-anchored concentrations (uM)
-C_high_start = 0.070;  % 50 mg/day  — high start dose
-C_high_ther  = 0.282;  % 200 mg/day — high therapeutic
-C_max        = 0.423;  % 300 mg/day — maximum dose
+C_high_start = 0.070;  % 50 mg/day  — high start dose - 6ms (1.6%) QT prolongation
+C_high_ther  = 0.282;  % 200 mg/day — high therapeutic - 19ms (5.2%) QT prolongation
+C_max        = 0.423;  % 300 mg/day — maximum dose - 26ms (7.0%) QT prolongation
 
 % Control (female baseline, no drug)
 params(1:4) = param;

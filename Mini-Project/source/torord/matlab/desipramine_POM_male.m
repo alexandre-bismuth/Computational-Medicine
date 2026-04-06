@@ -31,6 +31,7 @@ LHSR = rescale(LHS, lb, ub);
 
 % Desipramine maximum dose
 C = 0.423;  % uM (300 mg/day)
+% No EAD
 
 IC50_INa  = 1.52;  h_INa  = 1;
 IC50_ICaL = 1.71;  h_ICaL = 1;

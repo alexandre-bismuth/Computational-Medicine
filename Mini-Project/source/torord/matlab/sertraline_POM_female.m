@@ -38,7 +38,8 @@ F_ICaL  = 1.24;
 F_INaCa = 1.44;
 
 % Sertraline maximum dose
-C = 0.328;  % uM (200 mg/day)
+C =  0.328;  % uM (200 mg/day)
+% 0.110uM is the tipping point for EAD
 
 IC50_IKr  = 0.70;   h_IKr  = 1.30;
 IC50_ICaL = 2.60;   h_ICaL = 1.90;

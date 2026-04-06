@@ -41,6 +41,7 @@ F_INaCa = 1.44;
 
 % Amitriptyline maximum dose
 C = 0.518;  % uM (300 mg/day)
+% 0.445 is the tipping concentration for EAD
 
 IC50_IKr  = 3.28;  h_IKr  = 1;
 IC50_IKs  = 2.73;  h_IKs  = 1;

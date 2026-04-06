@@ -28,6 +28,7 @@ LHSR = rescale(LHS, lb, ub);
 
 % Sertraline maximum dose
 C = 0.328;  % uM (200 mg/day)
+% Does not show any sign of EAD
 
 IC50_IKr  = 0.70;   h_IKr  = 1.30;
 IC50_ICaL = 2.60;   h_ICaL = 1.90;

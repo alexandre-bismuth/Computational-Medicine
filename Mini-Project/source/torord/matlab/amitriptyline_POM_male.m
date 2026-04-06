@@ -29,6 +29,7 @@ LHSR = rescale(LHS, lb, ub);
 
 % Amitriptyline maximum dose
 C = 0.518;  % uM (300 mg/day)
+% No EAD
 
 IC50_IKr  = 3.28;  h_IKr  = 1;
 IC50_IKs  = 2.73;  h_IKs  = 1;

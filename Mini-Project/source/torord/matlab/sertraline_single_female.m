@@ -51,9 +51,9 @@ IC50_IKs  = 12.30; h_IKs  = 2.50;
 coef = @(X, IC50, h) 1 / (1 + (X/IC50)^h);
 
 % Clinically-anchored concentrations (uM)
-C_start = 0.082;   % 50 mg/day  — start dose
-C_mid   = 0.205;   % 125 mg/day — mid therapeutic
-C_high  = 0.328;   % 200 mg/day — high therapeutic (maximum)
+C_start = 0.082;   % 50 mg/day  — start dose % 10ms (2.8%) longer QT interval
+C_mid   = 0.205;   % 125 mg/day — mid therapeutic % 30ms (8.3%) longer QT interval
+C_high  = 0.328;   % 200 mg/day — high therapeutic (maximum) % 50ms (11.1%) longer QT interval
 
 % Control (female baseline, no drug)
 params(1:4) = param;

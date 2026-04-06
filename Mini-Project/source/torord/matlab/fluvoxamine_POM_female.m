@@ -37,6 +37,7 @@ F_INaCa = 1.44;
 
 % Fluvoxamine maximum dose
 C = 0.250;  % uM (300 mg/day)
+% No EAD
 
 IC50_IKr  = 3.80;  h_IKr  = 1;
 IC50_ICaL = 4.90;  h_ICaL = 1;

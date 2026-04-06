@@ -31,7 +31,7 @@ coef = @(X, IC50, h) 1 / (1 + (X/IC50)^h);
 % Clinically-anchored concentrations (uM)
 C_start    = 0.042;  % 50 mg/day  — start dose (at bedtime)
 C_low_ther = 0.083;  % 100 mg/day — low therapeutic
-C_high_ther = 0.250; % 300 mg/day — high therapeutic (maximum)
+C_high_ther = 0.250; % 300 mg/day — high therapeutic (maximum) - 6ms (2.0%) QT prolongation for max dose: negligible compared to other antidepressants
 
 % Control (no drug)
 params(1:4) = param;

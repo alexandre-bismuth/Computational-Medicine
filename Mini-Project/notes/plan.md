@@ -103,6 +103,38 @@ All dosage figures are sourced from FDA-approved public drug labels (DailyMed / 
 - Amitriptyline's 300 mg/day maximum is reserved for inpatients only; outpatient doses rarely exceed 150 mg/day.
 - Desipramine doses above 200 mg/day should generally be managed in a hospital setting with regular ECG monitoring, given the risk of QRS/QT interval prolongation at higher plasma levels.
 
+### mg/day → µM Conversion
+
+Steady-state total plasma concentration is estimated from the one-compartment oral dosing formula at steady state:
+
+$$C_{ss}\ (\mu\text{M}) = \frac{\text{Dose (mg/day)} \times 1000}{24 \times CL/F \times MW}$$
+
+where CL/F is apparent oral clearance (L/h) and MW is molecular weight (g/mol). Assumes extensive metaboliser phenotype, linear kinetics, and once-daily dosing at steady state.
+
+#### Pharmacokinetic constants used
+
+| Drug | MW (g/mol) | CL/F (L/h) | Notes |
+|---|---|---|---|
+| Sertraline | 306.23 | 83 | Midpoint of 71–95 L/h literature range |
+| Fluvoxamine | 318.33 | 157 | Healthy young adults at low doses; CL/F decreases at high doses (autoinhibition of CYP1A2/2C19) |
+| Amitriptyline | 277.40 | 87 | Systemic CL with ~50% first-pass bioavailability |
+| Desipramine | 266.38 | 111 | Standard CYP2D6 extensive metaboliser |
+
+#### Resulting simulation concentrations (µM)
+
+| Drug | Start | Therapeutic range | Maximum |
+|---|---|---|---|
+| Sertraline | 0.082 | 0.082 – 0.328 | 0.328 |
+| Fluvoxamine | 0.042 | 0.083 – 0.250 | 0.250 |
+| Amitriptyline | 0.129 (outpatient); 0.173 (inpatient) | 0.129 – 0.259 (outpatient); up to 0.345 (inpatient) | 0.518 |
+| Desipramine | 0.035 – 0.070 | 0.141 – 0.282 | 0.423 |
+
+#### Limitations of this conversion
+
+- **Fluvoxamine non-linear kinetics**: fluvoxamine inhibits its own metabolism (CYP1A2/2C19 autoinhibition), so CL/F falls as dose increases. The 0.250 µM maximum using CL/F = 157 L/h is therefore a likely **underestimate** at 300 mg/day; the true concentration may be substantially higher.
+- **Genetic polymorphisms**: values assume extensive metabolisers. Poor CYP2D6 metabolisers (desipramine, sertraline) or poor CYP2C19 metabolisers (sertraline, amitriptyline) can have CL/F < 33 L/h, pushing plasma concentrations into the toxic range (>1.4 µM for desipramine at 300 mg/day). Ultra-rapid metabolisers may never reach therapeutic concentrations.
+- **Total vs free concentration**: these are total plasma concentrations. SSRIs and TCAs are highly protein-bound (sertraline ~98%, amitriptyline ~95%). Free (pharmacologically active) concentrations are 2–5% of the values above. Hill equation IC50 values from patch-clamp are measured against total bath concentration, so using total plasma Css is internally consistent for the simulation but does not reflect the free drug concentration at the cardiac cell membrane.
+
 ### Sex Parameterisation
 
 Full female baseline scaling from Yang & Clancy (2017), derived from human cardiac gene expression data (Gaborit et al. 2010). Applied multiplicatively to the default ToR-ORd male parameters (baseline = 1.0):

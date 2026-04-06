@@ -41,7 +41,7 @@ coef = @(X, IC50, h) 1 / (1 + (X/IC50)^h);
 % Clinically-anchored concentrations (uM)
 C_start    = 0.129;  % 75 mg/day  — start dose (outpatient)
 C_high_ther = 0.345; % 200 mg/day — high therapeutic (inpatient)
-C_max      = 0.518;  % 300 mg/day — maximum (inpatient only)
+C_max      = 0.518;  % 300 mg/day — maximum (inpatient only) - only 11ms (3.7%) QT prolongation: negligible compared to other antidepressants 
 
 % Control (no drug)
 params(1:4) = param;
