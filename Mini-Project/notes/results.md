@@ -21,7 +21,6 @@ values and Hill coefficients from McMillan et al. (2017) and, for sertraline, Af
 | Sertraline    | SSRI  | 0.328 uM          | **0.110 uM**           | Yes (3.0×)       | No        |
 | Amitriptyline | TCA   | 0.518 uM          | **0.445 uM**           | Yes (1.2×)       | No        |
 | Desipramine   | TCA   | 0.423 uM          | No EAD                 | No               | No        |
-| Fluvoxamine   | SSRI  | 0.250 uM          | No EAD                 | No               | No        |
 
 > "EAD at Max Dose?" ratio in parentheses = max dose / EAD threshold; values > 1 indicate the
 > clinical ceiling exceeds the arrhythmogenic threshold.
@@ -34,7 +33,7 @@ values and Hill coefficients from McMillan et al. (2017) and, for sertraline, Af
 - **EAD threshold (female): 0.110 uM**; max dose 0.328 uM (200 mg/day, MW = 306 g/mol).
 - EAD onset occurs at roughly one-third of the maximum clinical concentration, meaning EAD is
   predicted across nearly the entire upper therapeutic range in female models.
-- Sertraline has the most potent hERG block of the four drugs (IKr IC50 = 0.70 uM, h = 1.30).
+- Sertraline has the most potent hERG block of the three drugs (IKr IC50 = 0.70 uM, h = 1.30).
   At the EAD threshold, ~8% additional IKr block is applied on top of the female ×0.82 scaling,
   bringing effective IKr to ≈75% of the female baseline. At max dose (~27% IKr block), effective
   IKr falls to ≈60% of female baseline (≈49% of male baseline).
@@ -72,14 +71,6 @@ values and Hill coefficients from McMillan et al. (2017) and, for sertraline, Af
 - IKs, Ito, and IK1 are not significantly blocked at clinical concentrations; their female
   downscaling alone is not enough to trigger EAD in the absence of strong IKr block.
 
-### Fluvoxamine (SSRI)
-- **No EAD at max dose (0.250 uM)** in either sex.
-- Channel block: IKr IC50 = 3.80 uM, ICaL IC50 = 4.90 uM, INa IC50 = 39.4 uM.
-- At 0.250 uM, IKr block is only ~6% and ICaL block ~5%; IKs, Ito, and IK1 are not blocked.
-- The maximum clinical dose (0.250 uM) is well below the IKr IC50, providing a wide safety
-  margin. Even with female IKr ×0.82 scaling, the net repolarisation reserve is not
-  sufficiently compromised to produce EAD.
-
 ---
 
 ## Interpretation
@@ -108,7 +99,6 @@ The critical variable is the ratio of **maximum clinical concentration to IKr IC
 | Sertraline    | 0.328      | 0.70          | 0.47             |
 | Amitriptyline | 0.518      | 3.28          | 0.16             |
 | Desipramine   | 0.423      | 1.39          | 0.30             |
-| Fluvoxamine   | 0.250      | 3.80          | 0.07             |
 
 Sertraline achieves the highest fractional IKr block at clinical concentrations despite being
 an SSRI, because its IKr IC50 (0.70 uM) is unusually low — lower even than desipramine's
@@ -124,9 +114,6 @@ female POM.
 Desipramine, despite stronger absolute IKr block than amitriptyline at its max dose, avoids
 EAD because it simultaneously reduces ICaL (IC50 = 1.71 uM), which dampens the inward
 current necessary to sustain a plateau and re-activate calcium channels.
-
-Fluvoxamine has both a low absolute concentration and weak channel affinities; block fractions
-at max dose are too small to perturb the plateau meaningfully in either sex.
 
 ### Sex as a risk modifier
 
@@ -187,15 +174,6 @@ Concentrations: 75 mg/day = 0.129 uM | 200 mg/day = 0.345 uM | 300 mg/day = 0.51
 
 > Note: QT data recorded in comments only at maximum dose for amitriptyline.
 
-#### Fluvoxamine (SSRI)
-Concentrations: 50 mg/day = 0.042 uM | 100 mg/day = 0.083 uM | 300 mg/day = 0.250 uM
-
-| Concentration | Male ΔAPD90 | Female ΔAPD90 |
-|---------------|:-----------:|:-------------:|
-| Max (0.250 uM) | +6 ms (2.0%) | +8 ms (1.2%) |
-
-> Note: QT data recorded in comments only at maximum dose for fluvoxamine.
-
 ---
 
 ### Interpretation of Single-Cell QT Results
@@ -215,7 +193,6 @@ Applying these thresholds to our simulations:
 | Sertraline    | 0.328 uM | +40 ms | +50 ms | Exceeds strong-TdP threshold (>12 ms monotherapy; >25 ms metabolic inhibition range) |
 | Desipramine   | 0.423 uM | +20 ms | +26 ms | Borderline — exceeds 12 ms but < 25 ms; female at the 25 ms boundary |
 | Amitriptyline | 0.518 uM | +11 ms | +15 ms | Below 12 ms (male); borderline (female) |
-| Fluvoxamine   | 0.250 uM | +6 ms  | +8 ms  | Well below threshold — low concern |
 
 #### Cross-validation with Lin & Kung Table 1 clinical data
 
@@ -273,7 +250,7 @@ magnitude alone is a poor separator of actual arrhythmic risk**:
 Grandi et al. (2018) argue that QT/hERG screening alone is an insufficient and potentially
 misleading proxy for TdP risk, and advocate for the Comprehensive in vitro Proarrhythmia Assay
 (CiPA) paradigm: multi-channel in vitro block data fed into in silico cardiac cell models, with
-results verified in hiPSC-CMs. Our results from all four antidepressants directly illustrate why
+results verified in hiPSC-CMs. Our results from all three antidepressants directly illustrate why
 this is necessary:
 
 1. **Multi-channel balance matters**: Desipramine's IKr block (IC50 = 1.39 uM) is stronger at
@@ -309,7 +286,7 @@ this is necessary:
 ## References
 
 - McMillan et al. (2017). *Tox. Res.* DOI: 10.1039/c7tx00141j — channel block parameters
-  (amitriptyline, desipramine, fluvoxamine) and in silico pro-arrhythmia framework.
+  (amitriptyline, desipramine) and in silico pro-arrhythmia framework.
 - Afkhami et al. (PMC3484517) — channel block parameters for sertraline.
 - Yang & Clancy (2017) — female ventricular electrophysiology scaling.
 - Gaborit et al. (2010) — human cardiac ion channel expression sex differences.
