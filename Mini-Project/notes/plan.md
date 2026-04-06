@@ -105,8 +105,25 @@ All dosage figures are sourced from FDA-approved public drug labels (DailyMed / 
 
 ### Sex Parameterisation
 
-- Female IKr multiplier: **×0.85** (15% lower IKr conductance; consistent with Rautaharju et al. ~10–20 ms longer QTc in women)
-- All other ion channels: same LHS variability for both sexes
+Full female baseline scaling from Yang & Clancy (2017), derived from human cardiac gene expression data (Gaborit et al. 2010). Applied multiplicatively to the default ToR-ORd male parameters (baseline = 1.0):
+
+| Current | Female scaling | Functional consequence |
+|---|---|---|
+| IKr | ×0.82 | Reduced repolarisation reserve → longer APD90 |
+| IKs | ×0.79 | Reduced repolarisation reserve, compound effect with IKr |
+| Ito | ×0.79 | Smaller phase-1 notch, alters AP morphology |
+| IK1 | ×0.87 | Slightly reduced resting K⁺ conductance |
+| ICaL | ×1.24 | Increased plateau inward current → APD prolongation |
+| INaCa | ×1.44 | Increased Ca²⁺ extrusion, raises intracellular Ca²⁺ load |
+| INaK | ×1.00 | Unchanged baseline conductance |
+| INaL | ×1.00 | Unchanged baseline conductance |
+
+Drug block is applied multiplicatively on top of the female baseline:
+`IKr_Multiplier = 0.82 × coef(C, IC50_IKr, h_IKr)` (and equivalently for each blocked channel).
+
+> **Note on INaK and INaL**: While their conductance scaling is 1.00, their *activity* diverges between sexes due to the altered voltage and Ca²⁺ environment created by the six scaled currents — particularly relevant for amitriptyline's late-Na block.
+
+> **Previous parameterisation**: an earlier version used IKr ×0.85 only (Rautaharju et al. QTc data). The Yang & Clancy multi-channel parameterisation supersedes this; it is more mechanistically complete and better reproduces the female AP morphology (longer APD90, larger Ca²⁺ transient) observed in experimental data.
 
 ---
 
@@ -116,7 +133,12 @@ All dosage figures are sourced from FDA-approved public drug labels (DailyMed / 
 
 Extends `Class1/POM.m` with:
 
-1. **Sex-specific IKr**: `IKr_Multiplier = LHSR(i,5) * 0.85` for female models
+1. **Sex-specific channel scaling** (Yang & Clancy 2017): for female models, apply before LHS variability:
+   ```
+   IKr_Multiplier  = LHSR(i,5) * 0.82    IKs_Multiplier  = LHSR(i,6) * 0.79
+   Ito_Multiplier  = LHSR(i,7) * 0.79    IK1_Multiplier  = LHSR(i,?) * 0.87
+   ICaL_Multiplier = LHSR(i,1) * 1.24    INaCa_Multiplier = 1.44
+   ```
 2. **Drug block via Hill equation** (existing pattern from Flecainide in POM.m):
    ```matlab
    coef = @(X, IC50, h) 1 / (1 + (X/IC50)^h);
@@ -466,7 +488,9 @@ Mini-Project/
 | Wagner et al. 2020 | PTB-XL dataset |
 | Makkar et al. 1993 | Female preponderance in drug-induced TdP |
 | Rautaharju et al. 2009 | Sex differences in QTc, age dependence |
-| Rodriguez et al. 2010 | Sex-specific cardiac models, IKr sex parameterisation |
+| Rodriguez et al. 2010 | Sex-specific cardiac models, early IKr sex parameterisation |
+| Yang & Clancy 2017 | Full female ORd scaling factors (IKr, IKs, Ito, IK1, ICaL, INaCa) |
+| Gaborit et al. 2010 | Human cardiac ion channel gene expression data underpinning sex scaling |
 | Muszkiewicz et al. 2016 | Population of Models methodology |
 | McMillan et al. 2017 (Toxicol. Res., DOI: 10.1039/C7TX00141J) | Fluvoxamine, amitriptyline, desipramine IC50s — see per-drug tables above |
 | Afkhami et al. (PMC3484517) | Sertraline multi-channel IC50s |
