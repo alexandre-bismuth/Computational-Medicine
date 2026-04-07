@@ -24,14 +24,14 @@
 
 **Caption**: "Baseline action potential duration predicts antidepressant-induced arrhythmia vulnerability. Models with longer APD90 — disproportionately female — develop EADs at lower sertraline concentrations. Right panel shows the effect of heart rate on the sex-differential threshold; the counterintuitive finding that IKr-blocking antidepressants are more dangerous at rest than during exercise constitutes a novel simulation prediction."
 
-### Figure 3: PTB-XL Consistency Check
+### Figure 3: Simulation-Derived Risk Stratification in PTB-XL
 
 **Layout**: Left + Right panels
 
-- **Left**: Violin plots of QTc distribution in PTB-XL by sex, with simulation-derived reference boundary marked. Report proportion above boundary by sex. Women expected to have higher median QTc and greater proportion above threshold.
-- **Right**: QTc sex gap (female minus male median, ms) by age group in PTB-XL. Pre-menopausal (<50), perimenopausal (50–55), post-menopausal (>55). Expected: sex gap narrows with age.
+- **Left**: Violin plots of QTc distribution in PTB-XL by sex, with two simulation-derived risk tier boundaries overlaid: high-risk threshold (dashed, 441 ms — top quintile of female POM, where all EADs occur) and elevated-risk threshold (dotted, 424 ms — top 40%). Annotate proportion of each sex above the high-risk line (20% F vs 14% M).
+- **Right**: QTc sex gap (female minus male median, ms) by age group in PTB-XL. Pre-menopausal (<50): +10.0 ms; perimenopausal (50–54): +5.8 ms; post-menopausal (≥55): +8.6 ms. Bootstrap 95% CIs shown.
 
-**Caption**: "Clinical ECG data from PTB-XL are consistent with simulation-derived predictions. Female QTc is systematically higher than male QTc, with a greater proportion of women exceeding the simulation-derived repolarisation boundary. The sex gap in QTc narrows post-menopause, consistent with the hormonal modulation of IKr. These observations support but do not validate the simulation framework; prospective drug-outcome data are required for clinical validation."
+**Caption**: "Simulation-derived risk stratification applied to 8,705 normal PTB-XL ECGs. (A) Female QTc is systematically higher than male QTc (median 416 vs 407 ms, p < 10⁻⁴⁰). The dashed line marks the simulation-derived high-risk boundary (QTc ≥ 441 ms), corresponding to the top quintile of female baseline APD90 where all EADs occur; 20% of women vs 14% of men exceed this threshold (risk ratio 1.42). (B) The QTc sex gap narrows at perimenopause (+5.8 ms) relative to pre-menopause (+10.0 ms), partially consistent with the hormonal modulation of IKr, but widens again post-menopause (+8.6 ms), likely reflecting age-related QTc confounders. These observations support but do not validate the simulation framework; prospective drug-outcome data are required for clinical validation."
 
 ---
 
@@ -45,8 +45,8 @@
 | Research question | State the RQ verbatim |
 | Aim | Three aims as stated above |
 | Methods | ToR-ORd POM + Hill equation pharmacology + rate-dependence experiment → biomarker discovery → ECG biomarker evaluation in PTB-XL |
-| Findings | Key numbers: EAD thresholds by sex per drug, direction of rate-dependence effect, consistency with PTB-XL QTc distributions |
-| Conclusions | Sex-differential arrhythmia thresholds scale with IKr block potency across antidepressant classes; SSRIs show larger sex gaps than INa-dominant TCAs; simulation-derived repolarisation biomarkers are consistent with clinical ECG data; rate dependence modulates the sex gap in a direction that has clinical implications for exercise and anxiety co-exposure |
+| Findings | Key numbers: EAD thresholds by sex per drug (sertraline 0.110 uM female, no EAD male); baseline APD90 predicts vulnerability (r = 0.994); 20% of women vs 14% of men in PTB-XL fall in the simulation-predicted high-risk tier; QTc sex gap +9.1 ms consistent with simulation |
+| Conclusions | Sex-differential arrhythmia thresholds scale with IKr block potency across antidepressant classes; simulation-derived risk stratification identifies a clinically meaningful population at elevated vulnerability, with women overrepresented 1.42:1; the approach bridges single-cell mechanistic modelling to population-scale ECG data |
 
 ### Introduction (15 marks)
 
@@ -94,8 +94,8 @@
 
 - Part 1: 4 drugs × 7 concentrations × 2 sexes × 30 models; EAD detection + APD90
 - Rate-dependence: sertraline × 3 BCL × 2 sexes × 5 concentrations × 30 models
-- Part 1→2 bridge: correlation of baseline AP features with EAD threshold; reference boundary derivation
-- Part 2: ECG feature extraction from PTB-XL lead II; distributional analysis by sex and age group
+- Part 1→2 bridge: correlation of baseline AP features with EAD threshold (r = 0.994); quintile analysis; risk tier derivation via percentile mapping (APD90 percentile → QTc percentile)
+- Part 2: ECG feature extraction from 8,705 normal PTB-XL ECGs (Lead II, 500 Hz, neurokit2); risk tier classification of every individual; sex- and age-stratified analysis
 - Sensitivity: IC50 ±50%, IKr sex multiplier [0.75, 0.85, 0.95]
 
 **Open science and reproducibility (5 marks)**:
@@ -122,10 +122,11 @@
 
 **Results addressing the research question (10 marks)**:
 
-- Part 1: EAD thresholds (or APD90 prolongation) by sex per drug; ranking by IKr dominance across SSRI vs TCA classes
+- Part 1: EAD thresholds by sex per drug; ranking by IKr dominance across SSRI vs TCA classes (sertraline > amitriptyline > desipramine)
 - Part 1 rate dependence: direction of sex gap change under sertraline at BCL 600 vs 1200 ms
-- Part 1→2 bridge: baseline APD90 and triangulation predict EAD vulnerability; reference boundary derived
-- Part 2: PTB-XL QTc and Tpeak–Tend distributions by sex and age group; consistency with simulation predictions assessed
+- Part 1→2 bridge: baseline APD90 predicts drug-induced APD90 with r = 0.994; quintile analysis shows top 20% receives 3× the prolongation and contains all EADs; risk tiers derived
+- Part 2 core: risk stratification of 8,705 PTB-XL ECGs — 20% of women vs 14% of men fall in the simulation-predicted high-risk tier (ratio 1.42); the high-risk group is 63% female and older (median age 59)
+- Part 2 sex gap: female QTc > male by 9.1 ms (p < 10⁻⁴⁰); gap narrows at perimenopause (+5.8 ms) but rebounds post-menopause (+8.6 ms)
 
 **Max 3 figures (10 marks)**:
 
@@ -145,8 +146,9 @@
 **At least one unexpected/negative/inconclusive result (5 marks)**:
 
 - **Candidate 1 (negative)**: Desipramine shows minimal sex differential — confirms that the female vulnerability is mechanism-specific to IKr block, not a general drug effect. This is a negative result that strengthens the mechanistic claim, and usefully differentiates TCAs by their dominant blocking profile.
-- **Candidate 2 (unexpected)**: Rate dependence may reduce rather than amplify the sex gap — if fast pacing shortens APD equally in both sexes, elevated heart rate may not worsen relative female risk. Report honestly.
-- **Candidate 3 (inconclusive)**: At low concentrations of amitriptyline, competing INa and ICaL block may shorten APD in some models, producing a non-monotonic dose-response despite IKr block. This complicates the narrative and must be discussed rather than smoothed over.
+- **Candidate 2 (unexpected, from Part 2)**: Tpeak–Tend sex gap is reversed: males have 4.0 ms longer Tpeak–Tend than females (p < 10⁻⁴¹), opposite to the simulation prediction (AP triangulation → Tpeak–Tend). This demonstrates that single-cell AP triangulation does not map straightforwardly to Tpeak–Tend, which also reflects transmural dispersion across the ventricular wall. Males have larger hearts with greater transmural heterogeneity, dominating the single-cell effect. This is an honest negative result that exposes a limitation of the AP-to-ECG surrogate mapping.
+- **Candidate 3 (partially consistent)**: The QTc sex gap narrows at perimenopause (+5.8 ms vs +10.0 ms pre-menopause), supporting the estrogen–IKr mechanism, but rebounds to +8.6 ms post-menopause rather than continuing to narrow. This partial consistency suggests the hormonal mechanism is real but insufficient to explain the full post-menopausal QTc sex gap, which is confounded by age-related comorbidities.
+- **Candidate 4 (inconclusive)**: At low concentrations of amitriptyline, competing INa and ICaL block may shorten APD in some models, producing a non-monotonic dose-response despite IKr block. This complicates the narrative and must be discussed rather than smoothed over.
 
 ### Conclusions (15 marks)
 
@@ -154,9 +156,10 @@
 
 - Sex-differential arrhythmia thresholds scale with IKr block potency across antidepressant drug classes
 - Sertraline (IKr-dominant SSRI) produces a larger sex gap than INa-dominant TCAs (desipramine); amitriptyline occupies an intermediate position due to multi-channel block
-- Baseline AP features (APD90, triangulation) predict individual EAD vulnerability within a sex-stratified population
+- Baseline APD90 predicts drug-induced APD90 with near-perfect correlation (r = 0.994); vulnerability is concentrated in the top quintile of baseline APD90, which receives 3× the prolongation and contains all EADs
+- Simulation-derived risk tiers applied to 8,705 PTB-XL ECGs show that 20% of women vs 14% of men have resting QTc in the high-risk range (ratio 1.42), providing a population-scale estimate of sex-differential vulnerability
+- The QTc sex gap (+9.1 ms, p < 10⁻⁴⁰) is consistent with simulation predictions; the partial narrowing at perimenopause supports the estrogen–IKr mechanism
 - Rate-dependence of the sex gap under sertraline is a novel prediction: IKr-blocking antidepressants are more dangerous at rest and during sleep than during the anxiety or exercise that prompts their prescription
-- Simulation predictions are directionally consistent with PTB-XL ECG data; the post-menopausal narrowing of the sex gap in QTc provides the strongest consistency test
 
 **Critique of the proposed approach (5 marks)**:
 

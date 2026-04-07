@@ -26,9 +26,9 @@ Women's lower baseline IKr conductance (~15%) reduces repolarisation reserve, ma
 
 Simulate the effect of three antidepressants (sertraline, amitriptyline, desipramine) on sex-stratified populations of ventricular cell models. Identify which baseline electrophysiological features predict who develops arrhythmias, and at what drug concentration.
 
-### Part 2: ECG Biomarker Evaluation in Clinical Data (Python + PTB-XL)
+### Part 2: Simulation-Derived Risk Stratification in Clinical ECG Data (Python + PTB-XL)
 
-Translate simulation-derived AP biomarkers to ECG-measurable surrogates. Apply simulation-derived reference ranges to ~21,000 real ECGs from PTB-XL to test whether the predicted sex differences in repolarisation reserve are consistent with clinical observations. This is a **consistency check**, not a validated clinical classifier: there is no drug-outcome ground truth in PTB-XL, and results are presented as hypothesis-supporting or -contradicting evidence, not as diagnostic performance.
+Use the population of models from Part 1 to identify baseline AP biomarkers (APD90, triangulation) that predict which virtual patients develop EADs under antidepressant exposure. Map these AP-level vulnerability thresholds to ECG-measurable surrogates (QTc) via percentile mapping, defining simulation-derived risk tiers. Apply these tiers to ~9,000 normal ECGs from PTB-XL to estimate the proportion of real patients — stratified by sex and age — whose resting repolarisation falls in the simulation-predicted vulnerable range. This quantifies how many women vs men in a clinical population carry baseline electrophysiological characteristics that the model predicts would place them at elevated risk of antidepressant-induced arrhythmia. This is a **risk estimation**, not a validated clinical classifier: there is no drug-outcome ground truth in PTB-XL, and results are presented as hypothesis-supporting evidence, not as diagnostic performance.
 
 ---
 
