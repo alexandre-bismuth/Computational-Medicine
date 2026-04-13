@@ -11,6 +11,7 @@ import ast
 import os
 import warnings
 
+import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 import neurokit2 as nk
 import numpy as np
@@ -230,12 +231,12 @@ def analyse_features(features_df):
 
     # Age groups (relevant for menopause analysis)
     def age_group(age):
-        if age < 50:
-            return "Pre-menopausal\n(< 50)"
+        if age < 45:
+            return "Pre-menopausal\n(< 45)"
         elif age >= 55:
             return "Post-menopausal\n(>= 55)"
         else:
-            return None  # Exclude perimenopause (50–54)
+            return None  # Exclude perimenopause (45–54)
 
     features_df["age_group"] = features_df.age.apply(age_group)
 
@@ -276,7 +277,7 @@ def analyse_features(features_df):
     print("QTc SEX GAP BY AGE GROUP")
     print(f"{'─' * 70}")
 
-    age_order = ["Pre-menopausal\n(< 50)", "Post-menopausal\n(>= 55)"]
+    age_order = ["Pre-menopausal\n(< 45)", "Post-menopausal\n(>= 55)"]
 
     sex_gaps = []
     for ag in age_order:
@@ -346,44 +347,31 @@ def risk_stratification(features_df):
               f"drug_APD90={sub.drug_APD90.mean():.0f} ms, "
               f"EAD={int(sub.EAD.sum())}/{len(sub)}")
 
-    # ── Risk tiers from simulation ──
-    # High risk: top quintile (Q5) — 2/6 EADs, mean prolongation 142 ms
-    # Elevated risk: Q4 — no EADs but drug APD90 > 400 ms
-    # Low risk: Q1-Q3 — modest prolongation
+    # ── Risk tier from simulation ──
+    # Single threshold: top quintile (Q5) of female baseline APD90
+    # Contains all EADs and receives 3x the prolongation of Q1-Q4
     q80 = bl_f.APD90.quantile(0.80)
-    q60 = bl_f.APD90.quantile(0.60)
 
     # Percentile-map to QTc (using female PTB-XL distribution)
     ecg_f = features_df[features_df.sex == 1]["QTc_ms"]
-    qtc_high = ecg_f.quantile(0.80)
-    qtc_elevated = ecg_f.quantile(0.60)
+    qtc_threshold = ecg_f.quantile(0.80)
 
     print(f"\n{'─' * 70}")
-    print("SIMULATION-DERIVED RISK TIERS")
+    print("SIMULATION-DERIVED RISK TIER")
     print(f"{'─' * 70}")
-    print(f"HIGH RISK:     baseline APD90 >= {q80:.0f} ms (top 20%) -> QTc >= {qtc_high:.0f} ms")
-    print(f"               All EADs occur in this tier; mean prolongation 3x higher than low-risk")
-    print(f"ELEVATED RISK: baseline APD90 >= {q60:.0f} ms (top 40%) -> QTc >= {qtc_elevated:.0f} ms")
-    print(f"               Drug APD90 exceeds 400 ms; significant prolongation")
-    print(f"LOW RISK:      baseline APD90 < {q60:.0f} ms (bottom 60%) -> QTc < {qtc_elevated:.0f} ms")
+    print(f"ELEVATED RISK: baseline APD90 >= {q80:.0f} ms (top 20%) -> QTc >= {qtc_threshold:.0f} ms")
+    print(f"               All EADs occur in this tier; mean prolongation 3x higher than lower risk")
+    print(f"LOWER RISK:    baseline APD90 < {q80:.0f} ms (bottom 80%) -> QTc < {qtc_threshold:.0f} ms")
 
     # ── Classify every PTB-XL individual ──
-    def assign_tier(qtc):
-        if qtc >= qtc_high:
-            return "High risk"
-        elif qtc >= qtc_elevated:
-            return "Elevated risk"
-        else:
-            return "Low risk"
-
-    features_df["risk_tier"] = features_df.QTc_ms.apply(assign_tier)
+    features_df["risk_tier"] = features_df.QTc_ms.apply(
+        lambda qtc: "Elevated risk" if qtc >= qtc_threshold else "Lower risk")
 
     print(f"\n{'─' * 70}")
     print("PTB-XL RISK STRATIFICATION")
     print(f"{'─' * 70}")
 
-    tier_order = ["High risk", "Elevated risk", "Low risk"]
-    for tier in tier_order:
+    for tier in ["Elevated risk", "Lower risk"]:
         tier_df = features_df[features_df.risk_tier == tier]
         n = len(tier_df)
         n_f = (tier_df.sex == 1).sum()
@@ -403,107 +391,129 @@ def risk_stratification(features_df):
         print(f"    Median age: {age_med:.0f} years")
 
         # Age breakdown for this tier
-        under50 = (tier_df.age < 50).sum()
+        under45 = (tier_df.age < 45).sum()
         over55 = (tier_df.age >= 55).sum()
-        print(f"    Age < 50: {under50} ({under50/n*100:.0f}%)  |  "
+        print(f"    Age < 45: {under45} ({under45/n*100:.0f}%)  |  "
               f"Age >= 55: {over55} ({over55/n*100:.0f}%)")
 
     # Female/male risk ratio
-    f_high = (features_df.sex == 1) & (features_df.risk_tier == "High risk")
-    m_high = (features_df.sex == 0) & (features_df.risk_tier == "High risk")
-    f_rate_high = f_high.sum() / (features_df.sex == 1).sum()
-    m_rate_high = m_high.sum() / (features_df.sex == 0).sum()
+    f_elev = (features_df.sex == 1) & (features_df.risk_tier == "Elevated risk")
+    m_elev = (features_df.sex == 0) & (features_df.risk_tier == "Elevated risk")
+    f_rate_elev = f_elev.sum() / (features_df.sex == 1).sum()
+    m_rate_elev = m_elev.sum() / (features_df.sex == 0).sum()
 
-    print(f"\n  Female/Male risk ratio (high-risk tier): "
-          f"{f_rate_high/m_rate_high:.2f}")
+    print(f"\n  Female/Male risk ratio (elevated-risk tier): "
+          f"{f_rate_elev/m_rate_elev:.2f}")
 
-    return qtc_high, qtc_elevated
+    return qtc_threshold
 
 
 # ── Step 5: Generate Figure 3 ─────────────────────────────────────────────────
 
-def generate_figure3(features_df, sex_gaps, qtc_high=None, qtc_elevated=None):
-    """Generate Figure 3: violin plots with risk tiers + age-stratified sex gap."""
+def generate_figure3(features_df, qtc_threshold=None):
+    """Generate Figure 3: QT prolongation bars (left) + QTc violin plots (right)."""
 
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 4.5),
-                                    gridspec_kw={"width_ratios": [1, 1.3]})
+    fig, (ax_violin, ax_qt) = plt.subplots(1, 2, figsize=(10, 4))
 
+    # ── Left panel: single-cell QT prolongation by drug and dose ──
+    # ΔAPD90 (ms) at [start, mid, max] dose from single-cell simulations
+    qt_prolongation = {
+        "Sertraline":    {"Female": [10, 30, 50], "Male": [10, 25, 40]},
+        "Amitriptyline": {"Female": [4, 10, 15],  "Male": [3, 8, 11]},
+        "Desipramine":   {"Female": [6, 19, 26],  "Male": [4, 16, 20]},
+    }
+
+    drugs = ["Amitriptyline", "Desipramine", "Sertraline"]
+
+    # Colors: dark → light = start → mid → max dose
+    f_cols = ["#8B0000", "#D64550", "#F4A0A8"]
+    m_cols = ["#1B3A6B", "#4A90D9", "#87CEEB"]
+    dose_labels = ["Start dose", "Medium dose", "Maximum dose"]
+
+    bar_w = 0.35
+    inner_gap = 0.08
+    group_gap = 0.4
+
+    x_f = [i * (bar_w + inner_gap) for i in range(len(drugs))]
+    x_m = [x_f[-1] + bar_w + group_gap + i * (bar_w + inner_gap)
+           for i in range(len(drugs))]
+
+    for d, drug in enumerate(drugs):
+        for sex, xpos, cols in [("Female", x_f[d], f_cols), ("Male", x_m[d], m_cols)]:
+            vals = qt_prolongation[drug][sex]
+            segs = [vals[0], vals[1] - vals[0], vals[2] - vals[1]]
+            bottom = 0
+            for seg, col in zip(segs, cols):
+                ax_qt.bar(xpos, seg, bar_w, bottom=bottom, color=col,
+                          edgecolor="white", linewidth=0.4)
+                bottom += seg
+
+    # Drug labels on x-axis, coloured by sex
+    ax_qt.set_xticks(x_f + x_m)
+    ax_qt.set_xticklabels(drugs * 2, fontsize=6.5, rotation=20, ha="right")
+    for i, tl in enumerate(ax_qt.get_xticklabels()):
+        tl.set_color("#D64550" if i < len(drugs) else "#4A90D9")
+
+    # Group labels just below drug names
+    f_center = np.mean(x_f)
+    m_center = np.mean(x_m)
+    ax_qt.text(f_center, -0.10, "Female", ha="center", va="top", fontsize=9,
+               fontweight="bold", color="#D64550",
+               transform=ax_qt.get_xaxis_transform())
+    ax_qt.text(m_center, -0.10, "Male", ha="center", va="top", fontsize=9,
+               fontweight="bold", color="#4A90D9",
+               transform=ax_qt.get_xaxis_transform())
+
+    ax_qt.set_ylabel("$\\Delta APD_{90}$ (ms)")
+    ax_qt.set_title("QTc prolongation by drug and therapeutic dose",
+                    fontsize=10, fontweight="bold")
+    ax_qt.set_ylim(0, 55)
+    ax_qt.margins(x=0.02)
+
+    grey_shades = ["#333333", "#888888", "#CCCCCC"]
+    legend_handles = [mpatches.Patch(facecolor=grey_shades[i], edgecolor="white",
+                                     label=dose_labels[i]) for i in reversed(range(3))]
+    ax_qt.legend(handles=legend_handles, fontsize=7, loc="upper right")
+
+    # ── Right panel: QTc violin plot ──
     palette = {"Female": "#D64550", "Male": "#4A90D9"}
 
-    # ── Left panel: QTc violin plots by sex with risk tiers ──
     sns.violinplot(
         data=features_df, x="sex_label", y="QTc_ms",
-        palette=palette, inner="quartile", ax=ax1,
+        palette=palette, inner="quartile", ax=ax_violin,
         order=["Female", "Male"], cut=0, linewidth=0.8
     )
 
-    ax1.set_xlabel("")
-    ax1.set_ylabel("QTc (ms, Bazett)")
-    ax1.set_title("QTc distribution by sex",
-                  fontsize=10, fontweight="bold", loc="center")
+    ax_violin.set_xlabel("")
+    ax_violin.set_ylabel("QTc - Bazett correction (ms)")
+    ax_violin.set_title("QTc distribution in PTB-XL",
+                        fontsize=10, fontweight="bold")
 
-    # Overlay elevated risk boundary (top 20% — contains all EADs)
-    if qtc_high is not None:
-        ax1.axhline(y=qtc_high, color="#8B0000", linewidth=1.3, linestyle="--")
-        ax1.text(1.02, qtc_high, f" {qtc_high:.0f} ms\n (elevated risk)",
-                 transform=ax1.get_yaxis_transform(), va="center", fontsize=7,
-                 color="#8B0000", fontweight="bold")
+    if qtc_threshold is not None:
+        ax_violin.axhline(y=qtc_threshold, color="#8B0000", linewidth=1.3,
+                          linestyle="--")
+        ax_violin.text(1.02, qtc_threshold, f" {qtc_threshold:.0f} ms\n (elevated risk)",
+                       transform=ax_violin.get_yaxis_transform(), va="center",
+                       fontsize=7.5, color="#8B0000", fontweight="bold")
 
-        # Proportions above elevated-risk boundary
-        f_pct = (features_df[features_df.sex == 1]["QTc_ms"] >= qtc_high).mean() * 100
-        m_pct = (features_df[features_df.sex == 0]["QTc_ms"] >= qtc_high).mean() * 100
-        ax1.text(0, qtc_high + 6, f"{f_pct:.0f}%", ha="center", fontsize=8,
-                 fontweight="bold", color="black")
-        ax1.text(1, qtc_high + 6, f"{m_pct:.0f}%", ha="center", fontsize=8,
-                 fontweight="bold", color="black")
+        f_pct = (features_df[features_df.sex == 1]["QTc_ms"] >= qtc_threshold).mean() * 100
+        m_pct = (features_df[features_df.sex == 0]["QTc_ms"] >= qtc_threshold).mean() * 100
+        ax_violin.text(0, qtc_threshold + 6, f"{f_pct:.0f}%", ha="center", fontsize=9,
+                       fontweight="bold", color="black")
+        ax_violin.text(1, qtc_threshold + 6, f"{m_pct:.0f}%", ha="center", fontsize=9,
+                       fontweight="bold", color="black")
 
-    # Add sample sizes and medians below violins
-    y_bot = ax1.get_ylim()[0]
+    # Sample sizes and medians
+    y_bot = ax_violin.get_ylim()[0]
     for i, sex_label in enumerate(["Female", "Male"]):
         subset = features_df[features_df.sex_label == sex_label]
         n = len(subset)
         med = subset["QTc_ms"].median()
-        ax1.text(i, y_bot + 3, f"n={n}\nmedian={med:.0f} ms",
-                 ha="center", va="bottom", fontsize=8, style="italic")
+        ax_violin.text(i, y_bot + 3, f"n={n}\nmedian={med:.0f} ms",
+                       ha="center", va="bottom", fontsize=8, style="italic")
 
-    # ── Right panel: QTc sex gap by age group ──
-    if sex_gaps:
-        age_labels = ["< 50\n(pre-menopausal)", "≥ 55\n(post-menopausal)"]
-        gaps = [sg["gap_ms"] for sg in sex_gaps]
-        ci_lo = [sg["ci_lo"] for sg in sex_gaps]
-        ci_hi = [sg["ci_hi"] for sg in sex_gaps]
-        errors_lo = [g - lo for g, lo in zip(gaps, ci_lo)]
-        errors_hi = [hi - g for g, hi in zip(gaps, ci_hi)]
-
-        ax2.bar(range(len(gaps)), gaps, color="#D64550", alpha=0.75,
-                edgecolor="black", linewidth=0.8, width=0.5)
-        ax2.errorbar(range(len(gaps)), gaps, yerr=[errors_lo, errors_hi],
-                     fmt="none", ecolor="black", capsize=8, linewidth=1.8)
-
-        ax2.set_xticks(range(len(age_labels)))
-        ax2.set_xticklabels(age_labels, fontsize=10)
-        ax2.set_xlabel("Age group", fontsize=10)
-        ax2.set_ylabel("QTc sex gap (ms)\n(female - male median difference)", fontsize=10)
-        ax2.set_title("QTc sex gap by age group",
-                      fontsize=10, fontweight="bold", loc="center")
-        ax2.axhline(y=0, color="black", linewidth=0.7, linestyle="-")
-        ax2.set_ylim(bottom=0, top=max(gaps) + max(errors_hi) + 3.5)
-        ax2.set_xlim(-0.6, len(gaps) - 0.4)
-
-        # Add gap values above bars
-        for i, g in enumerate(gaps):
-            y_pos = g + errors_hi[i] + 1.2
-            ax2.text(i, y_pos, f"{g:+.1f} ms",
-                     ha="center", va="bottom", fontsize=10, fontweight="bold")
-
-        # Add sample sizes inside bars
-        for i, sg in enumerate(sex_gaps):
-            ax2.text(i, gaps[i] / 2,
-                     f"F={sg['n_female']}\nM={sg['n_male']}",
-                     ha="center", va="center", fontsize=8, color="white",
-                     fontweight="bold")
-
-    plt.tight_layout(w_pad=3)
+    plt.tight_layout()
+    fig.subplots_adjust(bottom=0.18)
 
     fig_path = os.path.join(OUTPUT_DIR, "figure3.png")
     fig.savefig(fig_path, dpi=300, bbox_inches="tight")
@@ -525,13 +535,13 @@ def main():
     features_df = extract_all_features(df_norm)
 
     # Step 3: Analyse
-    features_df, sex_gaps = analyse_features(features_df)
+    features_df, _ = analyse_features(features_df)
 
     # Step 4: POM risk stratification (core Part 2 analysis)
-    qtc_high, qtc_elevated = risk_stratification(features_df)
+    qtc_threshold = risk_stratification(features_df)
 
     # Step 5: Generate Figure 3
-    generate_figure3(features_df, sex_gaps, qtc_high, qtc_elevated)
+    generate_figure3(features_df, qtc_threshold)
 
     print("\nDone.")
 

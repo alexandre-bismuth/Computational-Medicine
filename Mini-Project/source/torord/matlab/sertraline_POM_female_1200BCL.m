@@ -19,7 +19,7 @@
 clear
 rng(42);
 
-param.bcl   = 1000;
+param.bcl   = 1200;
 param.model = @model_Torord;
 
 npar = 7;
@@ -171,5 +171,5 @@ T = table((1:nsmp)', LHSR(:,1), LHSR(:,2), LHSR(:,3), LHSR(:,4), ...
     'LHS_INaK', 'LHS_IKr', 'LHS_IKs', 'LHS_Ito', 'concentration_uM', ...
     'APD90', 'APD30', 'triangulation', 'Vpeak', 'Vrest', 'EAD', 'max_repol_rate'});
 
-writetable(T, fullfile(outdir, 'sertraline_female.csv'));
-fprintf('Saved POM_results/sertraline_female.csv\n');
+writetable(T, fullfile(outdir, 'sertraline_female_BCL_1200.csv'));
+fprintf('Saved POM_results/sertraline_female_BCL_1200.csv\n');

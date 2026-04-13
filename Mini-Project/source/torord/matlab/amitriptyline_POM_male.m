@@ -71,7 +71,7 @@ for i = 1:nsmp
     hold on
     plot(currents{i}.time, currents{i}.V);
 end
-title('AP — Amitriptyline max dose, Male POM');
+title('Action Potential — Male population of models for a maximum therapeutic dose of Amitriptyline');
 xlabel('Time (ms)');
 ylabel('Membrane potential (mV)');
 
@@ -125,10 +125,24 @@ for i = 1:nsmp
         APD30_vals(i) = t(dn30) - t(up30);
     end
 
+    % EAD detection: scan only after V first drops below 0 mV (past plateau),
+    % then flag any rise > 5 mV above running minimum while above -40 mV
+    scan_start = 0;
     for j = peak_idx+1:length(V)
-        if V(j) > V(j-1) + 2 && V(j) > -40
-            EAD_vals(i) = 1;
+        if V(j) < 0
+            scan_start = j;
             break;
+        end
+    end
+    if scan_start > 0
+        Vmin_so_far = V(scan_start);
+        for j = scan_start+1:length(V)
+            if V(j) < Vmin_so_far
+                Vmin_so_far = V(j);
+            elseif V(j) > Vmin_so_far + 5 && Vmin_so_far > -40
+                EAD_vals(i) = 1;
+                break;
+            end
         end
     end
 

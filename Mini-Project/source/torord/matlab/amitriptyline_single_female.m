@@ -56,9 +56,9 @@ IC50_INa  = 20.0;  h_INa  = 1;
 coef = @(X, IC50, h) 1 / (1 + (X/IC50)^h);
 
 % Clinically-anchored concentrations (uM)
-C_start     = 0.129;  % 75 mg/day  — start dose (outpatient)
-C_high_ther = 0.345;  % 200 mg/day — high therapeutic (inpatient)
-C_max       = 0.518;  % 300 mg/day — maximum (inpatient only) - only 15ms (2.7%) QT prolongation with max dose: negligible compared to other antidepressants
+C_start     = 0.129;  % 75 mg/day  — start dose (outpatient) - 4ms (1.1%)
+C_high_ther = 0.345;  % 200 mg/day — high therapeutic (inpatient) - 10ms (2.7%)
+C_max       = 0.518;  % 300 mg/day — maximum (inpatient only) - only 15ms (4.0%) QT prolongation with max dose: low compared to other antidepressants
 
 % Control (female baseline, no drug)
 params(1:4) = param;
