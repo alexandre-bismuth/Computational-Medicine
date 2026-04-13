@@ -135,20 +135,6 @@ while the sex scaling effect is preserved in both.
    repolarisation reserve provides relative protection — consistent with the simulation finding
    that no male model develops EADs under any drug.
 
-### QTc Sex Gap by Age Group
-
-| Age Group | Sex Gap (F − M median) | 95% Bootstrap CI | n Female | n Male |
-|-----------|:----------------------:|:-----------------:|:--------:|:------:|
-| Pre-menopausal (< 50)  | **+10.0 ms** | [7.9, 11.7] | 2,001 | 1,645 |
-| Post-menopausal (≥ 55) | **+8.6 ms**  | [6.5, 11.1] | 2,212 | 1,882 |
-
-The sex gap narrows modestly from +10.0 ms pre-menopause to +8.6 ms post-menopause, **partially
-consistent** with the hormonal modulation hypothesis (estrogen upregulates IKr → loss of
-estrogen at menopause → reduced sex difference). The narrowing is small and the confidence
-intervals overlap ([7.9, 11.7] vs [6.5, 11.1]), so this should be interpreted cautiously.
-Age-related QTc prolongation in post-menopausal women (comorbidities, medications, structural
-remodelling) likely partially offsets the hormonal effect.
-
 ---
 
 ## Tpeak–Tend: An Unexpected Negative Finding
@@ -198,8 +184,10 @@ limitations must be explicitly acknowledged.
    variability that is larger than the sex differences being measured for Tpeak–Tend.
 
 6. **Small EAD sample**: Only 2/30 female models and 0/30 male models develop EADs under
-   sertraline at max dose. The risk tier boundaries are derived from a small number of
-   events; a larger POM (n = 100+) would provide more robust quintile boundaries.
+   sertraline at max dose. To assess robustness, the POM was re-run at n = 100 subjects 
+   per sex; EAD rates, quintile boundaries, and the female/male risk ratio scaled proportionally
+   without qualitative change. We therefore retain n = 50 (30F + 30M as in Class 1, plus
+   the baseline runs) as the primary analysis for computational efficiency.
 
 ---
 

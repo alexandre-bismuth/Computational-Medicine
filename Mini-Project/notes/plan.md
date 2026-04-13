@@ -4,7 +4,7 @@
 
 ## Research Question
 
-> **"How do electrophysiological cardiac sex differences affect vulnerability to arrhythmias induced by antidepressants, and can simulation-derived repolarisation biomarkers identify at-risk individuals from resting ECG data?"**
+> **"How do electrophysiological cardiac sex differences affect vulnerability to arrhythmias induced by antidepressants?"**
 
 ### Three Aims
 

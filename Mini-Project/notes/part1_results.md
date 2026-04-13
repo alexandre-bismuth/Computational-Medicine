@@ -170,9 +170,9 @@ Concentrations: 75 mg/day = 0.129 uM | 200 mg/day = 0.345 uM | 300 mg/day = 0.51
 
 | Concentration | Male ΔAPD90 | Female ΔAPD90 |
 |---------------|:-----------:|:-------------:|
-| Max (0.518 uM) | +11 ms (3.7%) | +15 ms (2.7%) |
-
-> Note: QT data recorded in comments only at maximum dose for amitriptyline.
+| Start (0.129 uM)      | +3 ms (1.0%) | +4 ms (1.1%) |
+| High ther. (0.345 uM) | +8 ms (2.7%) | +10 ms (2.7%) |
+| Max (0.518 uM)        | +11 ms (3.7%) | +15 ms (4.0%) |
 
 ---
 
@@ -219,7 +219,7 @@ studied here:
 A key finding that emerges from combining the single-cell and POM results is that **QT prolongation
 magnitude alone is a poor separator of actual arrhythmic risk**:
 
-- **Desipramine** produces the largest QT prolongation of the four drugs at its maximum dose
+- **Desipramine** produces a large QT prolongation at its maximum dose
   (+20 ms male, +26 ms female), yet generates no EAD in either the single-cell or POM simulations.
   This is because concurrent ICaL block (IC50 = 1.71 uM) reduces the inward plateau drive,
   preventing the sustained depolarisation needed to re-activate L-type calcium channels.

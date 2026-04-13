@@ -143,6 +143,24 @@ Extends `Class1/POM.m` with:
 4. **Simulation protocol**: 10 beats, extract last 2 (steady-state), BCL = 1000 ms
 5. **Output extraction**: APD90 + EAD detection for each model
 
+### LHS Bounds: Biological Justification and Limitations
+
+The LHS conductance scaling bounds [0.5, 2.0] are the standard in published cardiac POM work, taken directly from Muszkiewicz et al. 2016 (Prog Biophys Mol Biol 120:150–157). These bounds represent a 4× total span in channel conductance, motivated by human cardiac ion channel gene expression data from Gaborit et al. 2010 (J Physiol 588:1659–1675), which measured ~2–4 fold inter-individual variability in transcript levels across cardiac ion channels.
+
+**Why the bounds are approximately realistic**:
+- Gaborit et al. measured mRNA variability across human donor hearts; [0.5, 2.0] spans the observed range
+- The bounds are symmetric in log space: a model at 0.5× is as far from nominal as one at 2.0×
+- Using the same bounds for all 7 channels follows the convention established in Class 1 and in the published literature
+
+**Where the bounds are liberal**:
+- mRNA variability ≠ protein expression variability ≠ functional conductance variability. Each step attenuates the range, so [0.5, 2.0] likely overestimates conductance variability at the protein/channel level
+- LHS samples channels independently; in practice, some combinations (e.g. IKr × 0.5 AND IKs × 0.5 simultaneously) are unlikely in real patients because channels share regulatory pathways
+- In rigorous POM studies, a **calibration step** is applied post-sampling: any virtual patient whose AP biomarkers (APD90, Vpeak, Vrest, dV/dt_max) fall outside the physiologically observed human range is discarded (Muszkiewicz et al. 2016). This step was not applied here (following Class 1 convention), which means a small fraction of virtual patients at the extremes may be physiologically implausible
+
+**Practical consequence**: The broad bounds inflate the inter-individual APD90 range in simulation (female POM spans 219–525 ms) relative to the clinical QTc range (female PTB-XL IQR 397–436 ms). This is why the simulated sex gap in APD90 (~68 ms between medians) is larger than the clinical QTc sex gap (~9 ms). Crucially, the **rank ordering and direction** of the sex difference are preserved in both; only the absolute magnitudes differ due to the LHS sampling breadth. This discrepancy is discussed explicitly in Results and is expected from the methodology.
+
+> **Methods statement**: "Ion channel conductances were sampled using Latin hypercube sampling over the range [0.5, 2.0]× nominal, following Muszkiewicz et al. (2016) and the Class 1 convention. No calibration filter was applied; the LHS bounds therefore represent an upper bound on inter-individual conductance variability, consistent with the mRNA variability reported by Gaborit et al. (2010)."
+
 ### Experiments
 
 | Experiment | Conditions | Models | Total sims |
